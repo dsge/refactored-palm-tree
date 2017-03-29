@@ -48,27 +48,17 @@ public class TokenHandler {
     public boolean isAuthenticated(){
         return getToken() !== null && !expired();
     }
-
+    /**
+     * is our token's "exp" field's higher than the value of currentDate ?
+     */
     public boolean expired() {
-
-        Timestamp jwtTs = new Timestamp(Long.parseLong(UserService.getInstance(context).getExpTime())*1000);
-        Timestamp todayTs = new Timestamp(System.currentTimeMillis());
-        Date date = new Date(todayTs.getTime());
-        Date jwtDate = new Date(jwtTs.getTime());
-        Log.e("Todaydate and ts: "," " + date+" "+ todayTs);
-        Log.e("jwtdate and ts: "," " + jwtDate+" "+ jwtTs);
-        long diff = jwtDate.getTime() - date.getTime();
-
-
-            if (TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) <=2  || jwtDate.before(date)) {
-                return true;
-            }
-
-            Log.e("Before: "," " + jwtDate.before(date));
-            Log.e("After: "," " + jwtDate.after(date));
-            Log.e("Days "," " + TimeUnit.DAYS.convert(diff+1, TimeUnit.MILLISECONDS));
-
-        return false;
-
+        if (getToken() === null){
+            return true; //expired token counts as expired
+        }
+        if (/* token has no exp field */){
+            return false; //if no exp field exists then the token counts as valid since it never expires   
+        }
+        Date expirationDate = /* make a Date object from the token's exp field somehow */;
+        return expirationDate.before(getCurrentDate());
     }
 }
