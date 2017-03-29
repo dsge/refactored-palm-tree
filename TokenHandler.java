@@ -21,12 +21,25 @@ import eu.clapp.magunkert.activities.Splash;
 public class TokenHandler {
     
     String token = null;
+    Date currentDate = null;
     
     public void setToken(String t){
         token = t;
     }
     public String getToken(){
         return token;
+    }
+    public void setCurrentDate(Date d){
+        currentDate = d;   
+    }
+    public Date getCurrentDate(){
+        if (currentDate == null){
+            return getDefaultCurrentDate();   
+        }
+        return currentDate;
+    }
+    protected Date getDefaultCurrentDate(){
+        return Calendar.getInstance();
     }
 
     public boolean expired(Context context) {
