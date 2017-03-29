@@ -19,6 +19,15 @@ import eu.clapp.magunkert.activities.Splash;
  */
 
 public class TokenHandler {
+    
+    String token = null;
+    
+    public void setToken(String t){
+        token = t;
+    }
+    public String getToken(){
+        return token;
+    }
 
     public boolean expired(Context context) {
 
