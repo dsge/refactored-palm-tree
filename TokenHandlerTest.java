@@ -43,6 +43,7 @@ public class TokenHandlerTest {
         TokenHandler th = new TokenHandler();
         assertTrue(th.expired());
     }
+    
     @Test
     public void testMissingTokenWithNoExpFieldShouldNotBeExpired() {
         TokenHandler th = new TokenHandler();
@@ -54,6 +55,12 @@ public class TokenHandlerTest {
         th.setToken(token);
         
         assertFalse(th.expired());
+    }
+    
+    @Test
+    public void testMissingTokenShouldNotBeAuthenticated() {
+        TokenHandler th = new TokenHandler();
+        assertFalse(th.isAuthenticated());
     }
 
     public Date getDate(int year, int month, int day) {
