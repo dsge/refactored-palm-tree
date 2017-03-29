@@ -26,11 +26,10 @@ public class TokenHandlerTest {
     @Test
     public void testExpiredToken() {
         TokenHandler th = new TokenHandler();
-        Key key = MacProvider.generateKey();
         String token = Jwts.builder()
                 .setSubject("Joe")
                 .setExpiration(getDate(2030, 2, 3))
-                .signWith(SignatureAlgorithm.HS512, key)
+                .signWith(SignatureAlgorithm.HS512, MacProvider.generateKey())
                 .compact();
         
         th.setToken(token);
@@ -55,66 +54,6 @@ public class TokenHandlerTest {
         th.setToken(token);
         
         assertFalse(th.expired());
-    }
-
-    @Test
-    public void testNowTokenTest() {
-        TokenHandler th = new TokenHandler();
-        Calendar c = Calendar.getInstance();
-        Date date = c.getTime();
-
-        Key key = MacProvider.generateKey();
-
-        String compactJws = Jwts.builder()
-                .setSubject("Joe")
-                .setExpiration(date)
-                .signWith(SignatureAlgorithm.HS512, key)
-                .compact();
-
-        Log.e("MY_TOKEN", " " + compactJws);
-        System.out.println(compactJws);
-
-        assertTrue("Token", th.expiredTest(InstrumentationRegistry.getTargetContext().getApplicationContext(), compactJws));
-    }
-
-    @Test
-    public void testFutureTokenTest() {
-        TokenHandler th = new TokenHandler();
-        Date date = getDate(2017,6,1);
-
-
-        Key key = MacProvider.generateKey();
-
-        String compactJws = Jwts.builder()
-                .setSubject("Joe")
-                .setExpiration(date)
-                .signWith(SignatureAlgorithm.HS512, key)
-                .compact();
-
-        Log.e("MY_TOKEN", " " + compactJws);
-        System.out.println(compactJws);
-
-        assertFalse("Token", th.expiredTest(InstrumentationRegistry.getTargetContext().getApplicationContext(), compactJws));
-    }
-
-    @Test
-    public void testBefore2DaysTokenTest() {
-        TokenHandler th = new TokenHandler();
-
-        Date date = getDate(2017,2,25);
-
-        Key key = MacProvider.generateKey();
-
-        String compactJws = Jwts.builder()
-                .setSubject("Joe")
-                .setExpiration(date)
-                .signWith(SignatureAlgorithm.HS512, key)
-                .compact();
-
-        Log.e("MY_TOKEN", " " + compactJws);
-        System.out.println(compactJws);
-
-        assertTrue("Token", th.expiredTest(InstrumentationRegistry.getTargetContext().getApplicationContext(), compactJws));
     }
 
     public Date getDate(int year, int month, int day) {
