@@ -38,6 +38,24 @@ public class TokenHandlerTest {
         
         assertTrue(th.expired());
     }
+    
+    @Test
+    public void testMissingTokenShouldBeExpired() {
+        TokenHandler th = new TokenHandler();
+        assertTrue(th.expired());
+    }
+    @Test
+    public void testMissingTokenWithNoExpFieldShouldNotBeExpired() {
+        TokenHandler th = new TokenHandler();
+        String token = Jwts.builder()
+                .setSubject("Joe")
+                .signWith(SignatureAlgorithm.HS512, MacProvider.generateKey())
+                .compact();
+        
+        th.setToken(token);
+        
+        assertFalse(th.expired());
+    }
 
     @Test
     public void testNowTokenTest() {
