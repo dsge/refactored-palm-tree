@@ -19,61 +19,61 @@ import eu.clapp.magunkert.activities.Splash;
  */
 
 public class TokenHandler {
-
-    public boolean expired(Context context) {
-
-        Timestamp jwtTs = new Timestamp(Long.parseLong(UserService.getInstance(context).getExpTime())*1000);
-        Timestamp todayTs = new Timestamp(System.currentTimeMillis());
-        Date date = new Date(todayTs.getTime());
-        Date jwtDate = new Date(jwtTs.getTime());
-        Log.e("Todaydate and ts: "," " + date+" "+ todayTs);
-        Log.e("jwtdate and ts: "," " + jwtDate+" "+ jwtTs);
-        long diff = jwtDate.getTime() - date.getTime();
-
-
-            if (TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) <=2  || jwtDate.before(date)) {
-                return true;
-            }
-
-            Log.e("Before: "," " + jwtDate.before(date));
-            Log.e("After: "," " + jwtDate.after(date));
-            Log.e("Days "," " + TimeUnit.DAYS.convert(diff+1, TimeUnit.MILLISECONDS));
-
-        return false;
-
+    
+    String token = null;
+    Date currentDate = null;
+    int renewTreshold = 60 * 60 * 48; //seconds | if the expiration date is closer than this then the token should be renewed
+    
+    public void setToken(String t){
+        token = t;
     }
-
-    public boolean expiredTest(Context context,String token) {
-
-        UserService.getInstance(context).setToken(token);
-
-        Timestamp jwtTs = new Timestamp(Long.parseLong(UserService.getInstance(context).getExpTime())*1000);
-        Timestamp todayTs = new Timestamp(System.currentTimeMillis());
-        Date date = new Date(todayTs.getTime());
-        Date jwtDate = new Date(jwtTs.getTime());
-        Log.e("Todaydate and ts: "," " + date+" "+ todayTs);
-        Log.e("jwtdate and ts: "," " + jwtDate+" "+ jwtTs);
-        long diff = jwtDate.getTime() - date.getTime();
-
-
-            if (TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) <=2) {
-                return true;
-            }
-
-            Log.e("Before: "," " + jwtDate.before(date));
-            Log.e("After: "," " + jwtDate.after(date));
-            Log.e("Days: "," " + TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS));
-
-        return false;
-
+    public String getToken(){
+        return token;
     }
-
-
-    public boolean validToken(Context context,String token){
-
-        if (UserService.getInstance(context).getPayLoad(token) == ""){
-            return true;
+    public void setCurrentDate(Date d){
+        currentDate = d;   
+    }
+    public Date getCurrentDate(){
+        if (currentDate == null){
+            return getDefaultCurrentDate();   
         }
-        return false;
+        return currentDate;
+    }
+    protected Date getDefaultCurrentDate(){
+        return Calendar.getInstance();
+    }
+    /**
+     * do we have a valid token?
+     * a token is valid if it exists and it's not expired
+     */ 
+    public boolean isAuthenticated(){
+        return getToken() !== null && !expired();
+    }
+    /**
+     * is our token's "exp" field's higher than the value of currentDate ?
+     */
+    public boolean expired() {
+        if (getToken() === null){
+            return true; //missing token counts as expired
+        }
+        if (/* token has no exp field */){
+            return false; //if no exp field exists then the token counts as valid since it never expires   
+        }
+        Date expirationDate = /* make a Date object from the token's exp field somehow */;
+        return expirationDate.before(getCurrentDate());
+    }
+    /**
+     * should our token be renewed?
+     */
+    public boolean shouldBeRenewed(){
+        if (expired()){
+            return false; //if our token is expired then we cannot renew it   
+        }
+        if (/* token has no exp field */){
+            return false; //if no exp field exists then we don't want to renew it since it cannot even expire
+        }
+        Date expirationDate = /* make a Date object from the token's exp field somehow */;
+        Date renewDate = getCurrentDate() - renewTreshold; //make a new Date object that tells when the token should be renewed
+        return expirationDate.after(renewDate);
     }
 }
