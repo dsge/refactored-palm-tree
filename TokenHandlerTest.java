@@ -20,7 +20,7 @@ import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
 @RunWith(JUnit4.class)
-public class TokenTest {
+public class TokenHandlerTest {
 
 
     @Test
