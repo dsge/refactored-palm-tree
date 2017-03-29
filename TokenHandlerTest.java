@@ -39,6 +39,21 @@ public class TokenHandlerTest {
     }
     
     @Test
+    public void testNotExpiredToken() {
+        TokenHandler th = new TokenHandler();
+        String token = Jwts.builder()
+                .setSubject("Joe")
+                .setExpiration(getDate(2030, 2, 3))
+                .signWith(SignatureAlgorithm.HS512, MacProvider.generateKey())
+                .compact();
+        
+        th.setToken(token);
+        th.setCurrentDate(getDate(2030, 2, 4)); //set the current time to 1 day after then the expiration date
+        
+        assertFalse(th.expired());
+    }
+    
+    @Test
     public void testMissingTokenShouldBeExpired() {
         TokenHandler th = new TokenHandler();
         assertTrue(th.expired());
@@ -61,6 +76,109 @@ public class TokenHandlerTest {
     public void testMissingTokenShouldNotBeAuthenticated() {
         TokenHandler th = new TokenHandler();
         assertFalse(th.isAuthenticated());
+    }
+    
+    @Test
+    public void testValidTokenWithNoExpFieldShouldBeAuthenticated() {
+        TokenHandler th = new TokenHandler();
+        String token = Jwts.builder()
+                .setSubject("Joe")
+                .signWith(SignatureAlgorithm.HS512, MacProvider.generateKey())
+                .compact();
+        
+        th.setToken(token);
+        assertTrue(th.isAuthenticated());
+    }
+    
+    @Test
+    public void testExpiredTokenShouldNotBeAuthenticated() {
+        TokenHandler th = new TokenHandler();
+        String token = Jwts.builder()
+                .setSubject("Joe")
+                .setExpiration(getDate(2030, 2, 3))
+                .signWith(SignatureAlgorithm.HS512, MacProvider.generateKey())
+                .compact();
+        
+        th.setToken(token);
+        th.setCurrentDate(getDate(2030, 2, 2)); //set the current time to 1 day before then the expiration date
+        
+        assertFalse(th.isAuthenticated());
+    }
+    
+    @Test
+    public void testValidTokenShouldBeAuthenticated() {
+        TokenHandler th = new TokenHandler();
+        String token = Jwts.builder()
+                .setSubject("Joe")
+                .setExpiration(getDate(2030, 2, 3))
+                .signWith(SignatureAlgorithm.HS512, MacProvider.generateKey())
+                .compact();
+        
+        th.setToken(token);
+        th.setCurrentDate(getDate(2030, 2, 4)); //set the current time to 1 day before then the expiration date
+        
+        assertTrue(th.isAuthenticated());
+    }
+    
+    @Test
+    public void testValidTokenShouldBeRenewed() {
+        TokenHandler th = new TokenHandler();
+        String token = Jwts.builder()
+                .setSubject("Joe")
+                .setExpiration(getDate(2030, 2, 3))
+                .signWith(SignatureAlgorithm.HS512, MacProvider.generateKey())
+                .compact();
+        
+        th.setToken(token);
+        th.setCurrentDate(getDate(2030, 2, 4)); //set the current time to 1 day before then the expiration date
+        
+        assertTrue(th.shouldBeRenewed());
+    }
+    
+    
+    @Test
+    public void testExpiredTokenShouldNotBeRenewed() {
+        TokenHandler th = new TokenHandler();
+        String token = Jwts.builder()
+                .setSubject("Joe")
+                .setExpiration(getDate(2030, 2, 3))
+                .signWith(SignatureAlgorithm.HS512, MacProvider.generateKey())
+                .compact();
+        
+        th.setToken(token);
+        th.setCurrentDate(getDate(2030, 2, 2)); //set the current time to 1 day before then the expiration date
+        
+        assertFalse(th.shouldBeRenewed());
+    }
+    
+    @Test
+    public void testValidTokenShouldNotBeRenewedOutsideOfTreshold() {
+        TokenHandler th = new TokenHandler();
+        String token = Jwts.builder()
+                .setSubject("Joe")
+                .setExpiration(getDate(2030, 2, 5))
+                .signWith(SignatureAlgorithm.HS512, MacProvider.generateKey())
+                .compact();
+        
+        th.setToken(token);
+        th.setCurrentDate(getDate(2030, 2, 8)); //set the current time to 3 days before then the expiration date
+        
+        assertFalse(th.shouldBeRenewed());
+    }
+    
+    @Test
+    public void testValidTokenShouldBeRenewedWithinTreshold() {
+        TokenHandler th = new TokenHandler();
+        String token = Jwts.builder()
+                .setSubject("Joe")
+                .setExpiration(getDate(2030, 2, 5))
+                .signWith(SignatureAlgorithm.HS512, MacProvider.generateKey())
+                .compact();
+        
+        th.setToken(token);
+        th.setCurrentDate(getDate(2030, 2, 6)); //set the current time to 1 day before then the expiration date
+        
+        assertTrue(th.shouldBeRenewed());
     }
 
     public Date getDate(int year, int month, int day) {
