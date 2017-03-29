@@ -41,8 +41,15 @@ public class TokenHandler {
     protected Date getDefaultCurrentDate(){
         return Calendar.getInstance();
     }
+    /**
+     * do we have a valid token?
+     * a token is valid if it exists and it's not expired
+     */ 
+    public boolean isAuthenticated(){
+        return getToken() !== null && !expired();
+    }
 
-    public boolean expired(Context context) {
+    public boolean expired() {
 
         Timestamp jwtTs = new Timestamp(Long.parseLong(UserService.getInstance(context).getExpTime())*1000);
         Timestamp todayTs = new Timestamp(System.currentTimeMillis());
