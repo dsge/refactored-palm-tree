@@ -54,7 +54,7 @@ public class TokenHandler {
      */
     public boolean expired() {
         if (getToken() === null){
-            return true; //expired token counts as expired
+            return true; //missing token counts as expired
         }
         if (/* token has no exp field */){
             return false; //if no exp field exists then the token counts as valid since it never expires   
