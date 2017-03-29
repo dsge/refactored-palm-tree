@@ -24,22 +24,19 @@ public class TokenHandlerTest {
 
 
     @Test
-    public void testExpiredTokenTest() {
+    public void testExpiredToken() {
         TokenHandler th = new TokenHandler();
-        Date date = getDate(2016, 2, 1);
-
         Key key = MacProvider.generateKey();
-
-        String compactJws = Jwts.builder()
+        String token = Jwts.builder()
                 .setSubject("Joe")
-                .setExpiration(date)
+                .setExpiration(getDate(2030, 2, 3))
                 .signWith(SignatureAlgorithm.HS512, key)
                 .compact();
-
-        Log.e("MY_TOKEN", " " + compactJws);
-        System.out.println(compactJws);
-
-        assertTrue("Token", th.expiredTest(InstrumentationRegistry.getTargetContext().getApplicationContext(), compactJws));
+        
+        th.setToken(token);
+        th.setCurrentDate(getDate(2030, 2, 2)); //set the current time to 1 day before then the expiration date
+        
+        assertTrue(th.expired());
     }
 
     @Test
@@ -101,7 +98,6 @@ public class TokenHandlerTest {
 
         assertTrue("Token", th.expiredTest(InstrumentationRegistry.getTargetContext().getApplicationContext(), compactJws));
     }
-
 
     public Date getDate(int year, int month, int day) {
         Calendar cal = Calendar.getInstance();
