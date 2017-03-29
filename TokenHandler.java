@@ -22,7 +22,7 @@ public class TokenHandler {
     
     String token = null;
     Date currentDate = null;
-    int renewTreshold = 60 * 60 * 48; //seconds | if the expiration date is closed than this then the token should be renewed
+    int renewTreshold = 60 * 60 * 48; //seconds | if the expiration date is closer than this then the token should be renewed
     
     public void setToken(String t){
         token = t;
