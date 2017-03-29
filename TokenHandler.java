@@ -22,6 +22,7 @@ public class TokenHandler {
     
     String token = null;
     Date currentDate = null;
+    int renewTreshold = 60 * 60 * 48; //seconds | if the expiration date is closed than this then the token should be renewed
     
     public void setToken(String t){
         token = t;
@@ -60,5 +61,19 @@ public class TokenHandler {
         }
         Date expirationDate = /* make a Date object from the token's exp field somehow */;
         return expirationDate.before(getCurrentDate());
+    }
+    /**
+     * should our token be renewed?
+     */
+    public boolean shouldBeRenewed(){
+        if (expired()){
+            return false; //if our token is expired then we cannot renew it   
+        }
+        if (/* token has no exp field */){
+            return false; //if no exp field exists then we don't want to renew it since it cannot even expire
+        }
+        Date expirationDate = /* make a Date object from the token's exp field somehow */;
+        Date renewDate = getCurrentDate() - renewTreshold; //make a new Date object that tells when the token should be renewed
+        return expirationDate.after(renewDate);
     }
 }
